@@ -3,6 +3,7 @@ class Action:
         self.name = name
         self.price = price
         self.benefit = benefit
+        self.profit = self.calculate_profit()
 
     def calculate_profit(self):
         profit = (self.price * self.benefit) / 100

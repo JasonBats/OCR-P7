@@ -4,20 +4,6 @@ import random
 from model import Action
 
 
-def print_actions():
-    database_path = os.path.join(os.path.dirname(__file__),
-                                 'datas', 'actions.json')
-    with open(database_path, 'r', encoding="utf-8") as file:
-        data = json.load(file)
-
-    actions = []
-
-    for action in data:
-        action_object = Action(**action)
-        actions.append(action_object)
-        print(f'{action_object}, Profit estimé: {action_object.calculate_profit()}')
-
-
 def create_actions_objects():
     database_path = os.path.join(os.path.dirname(__file__),
                                  'datas', 'actions.json')
@@ -63,8 +49,13 @@ def get_all_hypothesis():
     while len(hypothesis_dict) < 1726:  # 1726 = all possible hypothesis
         hypothesis = calculate_wallet_profit(buy_actions())
         hypothesis_dict.setdefault(hypothesis[1], hypothesis[0])
-    print(len(hypothesis_dict))
-    return hypothesis_dict
+    profit = sorted(hypothesis_dict.items(), reverse=True)[0][0]
+    actions = sorted(hypothesis_dict.items(), reverse=True)[0][1]
+
+    best_hypothesis = [profit, actions]
+
+    print(f"Best option : {profit} -> {actions}")
+    return best_hypothesis
 
 
 get_all_hypothesis()
