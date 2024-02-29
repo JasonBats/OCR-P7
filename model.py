@@ -6,7 +6,7 @@ class Action:
         self.profit = self.calculate_profit()
 
     def calculate_profit(self):
-        profit = (self.price * self.benefit) / 100
+        profit = (self.price * self.benefit / 100)
         return round(profit, 2)
 
     def __repr__(self):
