@@ -5,6 +5,10 @@ import time
 
 
 def create_actions_objects_json():
+    """
+    Create action objects from a json file.
+    :return: Actions objects.
+    """
     database_path = os.path.join(os.path.dirname(__file__),
                                  'datas', 'actions.json')
     with open(database_path, 'r', encoding="utf-8") as file:
@@ -19,15 +23,27 @@ def create_actions_objects_json():
 
 
 def dynamic_wallet(capacite, actions):
+    """
+    Knapsack algorithm.
+    Creates a matrix where rows represent available actions and columns
+    different possible capacities of the wallet, from 0 to 'capacity'.
+    After filling out the matrix, the function traces back the selected actions
+    to maximize the profit.
+    :param capacite: The maximum capacity of the wallet, expressed in cents.
+    :param actions: A list of 'Action' objects, each having a 'price',
+    and a 'profit'.
+    :return: A tuple containing the best set of actions to buy
+    within a given budget.
+    """
     ping = time.perf_counter()
-    matrice = [[0 for x in range(capacite + 1)] for x in range(len(actions) + 1)]
+    matrix = [[0 for x in range(capacite + 1)] for x in range(len(actions) + 1)]
 
     for i in range(1, len(actions) + 1):
         for w in range(1, capacite + 1):
             if actions[i-1].price <= w:
-                matrice[i][w] = max(actions[i-1].profit + matrice[i-1][w-actions[i-1].price], matrice[i-1][w])
+                matrix[i][w] = max(actions[i-1].profit + matrix[i-1][w-actions[i-1].price], matrix[i-1][w])
             else:
-                matrice[i][w] = matrice[i-1][w]
+                matrix[i][w] = matrix[i-1][w]
 
     w = capacite
     n = len(actions)
@@ -35,7 +51,7 @@ def dynamic_wallet(capacite, actions):
 
     while w >= 0 and n >= 0:
         a = actions[n-1]
-        if matrice[n][w] == matrice[n-1][w-a.price] + a.profit:
+        if matrix[n][w] == matrix[n-1][w-a.price] + a.profit:
             actions_selection.append(a)
             w -= a.price
 
@@ -51,7 +67,7 @@ def dynamic_wallet(capacite, actions):
     print(f"Coût total : {budget}")
     print(f"Bénéfices : {benefit}")
     print(f"Temps d'exécution : {pong - ping:0.2f} secondes")
-    return matrice[-1][-1], actions_selection
+    return matrix[-1][-1], actions_selection
 
 
 dynamic_wallet(capacite=500, actions=create_actions_objects_json())
