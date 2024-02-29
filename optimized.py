@@ -1,7 +1,7 @@
 import os
 import json
-import csv
 from model import Action
+import time
 
 
 def create_actions_objects_json():
@@ -17,22 +17,9 @@ def create_actions_objects_json():
         actions.append(action_object)
     return actions
 
-def create_actions_objects_csv():
-    database_path = os.path.join(os.path.dirname(__file__),
-                                 'datas', 'actions.csv')
-    with open(database_path, 'r') as csv_file:
-        data = csv.reader(csv_file, delimiter=";")
-
-        actions = []
-
-        for action in data:
-            action_object = Action(name=action[0], price=float(action[1]), benefit=float(action[2]))
-            actions.append(action_object)
-    csv_file.close()
-    return actions
-
 
 def dynamic_wallet(capacite, actions):
+    ping = time.perf_counter()
     matrice = [[0 for x in range(capacite + 1)] for x in range(len(actions) + 1)]
 
     for i in range(1, len(actions) + 1):
@@ -54,9 +41,17 @@ def dynamic_wallet(capacite, actions):
 
         n -= 1
 
-    print(actions_selection)
+    budget = 0
+    benefit = 0
+    for action in actions_selection:
+        budget += action.price
+        benefit += action.profit
+    pong = time.perf_counter()
+    print(f"Actions sélectionnées : {actions_selection}")
+    print(f"Coût total : {budget}")
+    print(f"Bénéfices : {benefit}")
+    print(f"Temps d'exécution : {pong - ping:0.2f} secondes")
     return matrice[-1][-1], actions_selection
 
 
-# dynamic_wallet(capacite=500, actions=create_actions_objects_json())
-dynamic_wallet(capacite=500, actions=create_actions_objects_csv())
+dynamic_wallet(capacite=500, actions=create_actions_objects_json())
