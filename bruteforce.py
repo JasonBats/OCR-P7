@@ -1,8 +1,9 @@
 import os
 import json
-import random
+import csv
 from model import Action
-
+import itertools
+import time
 
 def create_actions_objects():
     database_path = os.path.join(os.path.dirname(__file__),
@@ -18,44 +19,34 @@ def create_actions_objects():
     return actions
 
 
-def buy_actions():
-    """
-    Buys random actions without exceeding the budget
-    :return: A list of actions.
-    """
+def get_all_combinations():
     actions = create_actions_objects()
-    budget = 500
-    wallet = []
-    while actions and budget > 0:
-        action = random.choice(actions)
-        actions.remove(action)
-        if action.price < budget:
-            budget -= action.price
-            wallet.append(action)
-    print(wallet)
-    print(budget)
-    return wallet
+    combinations = []
+    for L in range(0, len(actions) + 1):
+        for i in itertools.combinations(actions, L):
+            combinations.append(i)
+    print('Toutes les combinaisons possibles ont été stockées')
+    return combinations
 
 
-def calculate_wallet_profit(wallet):
-    profit = 0
-    for action in wallet:
-        profit += action.calculate_profit()
-    return wallet, round(profit, 2)
+def get_combinations_values(combinations, budget):
+    combinations_with_values = []
+    for combination in combinations:
+        price = 0
+        profit = 0
+        for action in combination:
+            price += action.price
+            profit += action.profit
+        combination_with_values = [combination, price, profit]
+        if price <= budget:
+            combinations_with_values.append(combination_with_values)
+    best_combination = sorted(combinations_with_values, key=lambda x: x[-1], reverse=True)[0]
+    print(f'Meilleure combinaison :{best_combination}')
+    print(f'Prix : :{best_combination[1]}')
+    print(f'Profit : :{round(best_combination[2], 2)}')
 
 
-def get_all_hypothesis():
-    hypothesis_dict = {}
-    while len(hypothesis_dict) < 1726:  # 1726 = all possible hypothesis
-        hypothesis = calculate_wallet_profit(buy_actions())
-        hypothesis_dict.setdefault(hypothesis[1], hypothesis[0])
-    profit = sorted(hypothesis_dict.items(), reverse=True)[0][0]
-    actions = sorted(hypothesis_dict.items(), reverse=True)[0][1]
-
-    best_hypothesis = [profit, actions]
-
-    print(f"Best option : {profit} -> {actions}")
-    return best_hypothesis
-
-
-get_all_hypothesis()
+ping = time.perf_counter()
+get_combinations_values(get_all_combinations(), budget=500)
+pong = time.perf_counter()
+print(f'Temps écoulé : {pong - ping:0.2f} secondes')
