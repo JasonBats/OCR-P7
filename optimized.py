@@ -1,28 +1,33 @@
 import os
-import json
+import csv
+from typing import Tuple, List
 from model import Action
-import time
+from decorator import perfs_decorator
 
 
-def create_actions_objects_json():
+def create_actions_objects():
     """
     Create action objects from a json file.
     :return: Actions objects.
     """
     database_path = os.path.join(os.path.dirname(__file__),
-                                 'datas', 'actions.json')
-    with open(database_path, 'r', encoding="utf-8") as file:
-        data = json.load(file)
+                                 'datas', 'actions.csv')  # actions.csv / memtest.csv / dataset1.csv / dataset2.csv
+    with open(database_path, 'r') as csv_file:
+        data = csv.reader(csv_file, delimiter=",")
 
-    actions = []
+        actions = []
 
-    for action in data:
-        action_object = Action(**action)
-        actions.append(action_object)
+        for action in data:
+            action_object = Action(name=action[0],
+                                   price=int(float(action[1])),
+                                   benefit=int(float(action[2])))
+            if action_object.price > 0:
+                actions.append(action_object)
+    csv_file.close()
     return actions
 
 
-def dynamic_wallet(capacite, actions):
+def dynamic_wallet(capacite: int, actions: list) -> Tuple[int, List]:
     """
     Knapsack algorithm.
     Creates a matrix where rows represent available actions and columns
@@ -35,7 +40,6 @@ def dynamic_wallet(capacite, actions):
     :return: A tuple containing the best set of actions to buy
     within a given budget.
     """
-    ping = time.perf_counter()
     matrix = [[0 for x in range(capacite + 1)] for x in range(len(actions) + 1)]
 
     for i in range(1, len(actions) + 1):
@@ -62,12 +66,15 @@ def dynamic_wallet(capacite, actions):
     for action in actions_selection:
         budget += action.price
         benefit += action.profit
-    pong = time.perf_counter()
     print(f"Actions sélectionnées : {actions_selection}")
     print(f"Coût total : {budget}")
     print(f"Bénéfices : {benefit}")
-    print(f"Temps d'exécution : {pong - ping:0.2f} secondes")
     return matrix[-1][-1], actions_selection
 
 
-dynamic_wallet(capacite=500, actions=create_actions_objects_json())
+@perfs_decorator
+def run_program():
+    dynamic_wallet(capacite=500, actions=create_actions_objects())
+
+
+run_program()
