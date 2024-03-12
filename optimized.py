@@ -11,7 +11,8 @@ def create_actions_objects():
     :return: Actions objects.
     """
     database_path = os.path.join(os.path.dirname(__file__),
-                                 'datas', 'actions.csv')  # actions.csv / memtest.csv / dataset1.csv / dataset2.csv
+                                 'datas', 'actions.csv')
+    # actions.csv / memtest.csv / dataset1.csv / dataset2.csv
     with open(database_path, 'r') as csv_file:
         data = csv.reader(csv_file, delimiter=",")
 
@@ -40,12 +41,15 @@ def dynamic_wallet(capacite: int, actions: list) -> Tuple[int, List]:
     :return: A tuple containing the best set of actions to buy
     within a given budget.
     """
-    matrix = [[0 for x in range(capacite + 1)] for x in range(len(actions) + 1)]
+    matrix = [[0 for x in range(capacite + 1)]
+              for x in range(len(actions) + 1)]
 
     for i in range(1, len(actions) + 1):
         for w in range(1, capacite + 1):
             if actions[i-1].price <= w:
-                matrix[i][w] = max(actions[i-1].profit + matrix[i-1][w-actions[i-1].price], matrix[i-1][w])
+                matrix[i][w] = max(
+                    actions[i-1].profit + matrix[i-1][w-actions[i-1].price],
+                    matrix[i-1][w])
             else:
                 matrix[i][w] = matrix[i-1][w]
 

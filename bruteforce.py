@@ -11,7 +11,8 @@ def create_actions_objects():
     :return: Actions objects.
     """
     database_path = os.path.join(os.path.dirname(__file__),
-                                 'datas', 'actions.csv')  # actions.csv / memtest.csv / dataset1.csv / dataset2.csv
+                                 'datas', 'actions.csv')
+    # actions.csv / memtest.csv / dataset1.csv / dataset2.csv
     with open(database_path, 'r') as csv_file:
         data = csv.reader(csv_file, delimiter=",")
 
@@ -41,7 +42,7 @@ def get_all_combinations():
     return combinations
 
 
-def custom_itertools_combinations(iterable, r):  # Detailed itertools.combinations
+def custom_itertools_combinations(iterable, r):  # Detailed itertools
     # combinations('ABCD', 2) --> AB AC AD BC BD CD
     # combinations(range(4), 3) --> 012 013 023 123
     pool = tuple(iterable)
@@ -97,4 +98,4 @@ def run_program():
     get_combinations_values(get_all_combinations(), budget=500)
 
 
-run_program()  # TODO : Flake-8 sur le projet
+run_program()

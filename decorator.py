@@ -7,7 +7,7 @@ def perfs_decorator(func):
         tracemalloc.start()  # Start memory tracking
         ping = time.perf_counter()  # Start time tracking
         func()
-        _, peak = tracemalloc.get_traced_memory()  # Store memory peak in variable.
+        _, peak = tracemalloc.get_traced_memory()  # Store memory peak.
         pong = time.perf_counter()  # Stop time tracking
         tracemalloc.stop()  # Stop memory tracking
         print(f'Peak : {peak / 1048576:.2f} MB')
