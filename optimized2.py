@@ -1,8 +1,8 @@
 import os
 import csv
+from typing import List, Tuple
 from model import Action
-import time
-import psutil
+from decorator import perfs_decorator
 
 
 def create_actions_objects_csv():
@@ -11,7 +11,7 @@ def create_actions_objects_csv():
     :return: Actions objects.
     """
     database_path = os.path.join(os.path.dirname(__file__),
-                                 'datas', 'dataset1.csv')
+                                 'datas', 'dataset2.csv')
     with open(database_path, 'r') as csv_file:
         data = csv.reader(csv_file, delimiter=",")
 
@@ -27,7 +27,7 @@ def create_actions_objects_csv():
     return actions
 
 
-def dynamic_wallet(capacite, actions):
+def dynamic_wallet(capacite: int, actions: list) -> Tuple[int, List]:
     """
     Knapsack algorithm.
     Creates a matrix where rows represent available actions and columns
@@ -40,7 +40,6 @@ def dynamic_wallet(capacite, actions):
     :return: A tuple containing the best set of actions to buy
     within a given budget.
     """
-    ping = time.perf_counter()
     matrix = [[0 for x in range(capacite + 1)] for x in range(len(actions) + 1)]
 
     for i in range(1, len(actions) + 1):
@@ -67,12 +66,15 @@ def dynamic_wallet(capacite, actions):
     for action in actions_selection:
         budget += action.price / 100
         benefit += round(((action.profit / 100) / 100), 2)
-    pong = time.perf_counter()
     print(f"Actions sélectionnées : {actions_selection}")
     print(f"Coût total : {budget}")
     print(f"Bénéfices : {benefit}")
-    print(f"Temps d'exécution : {pong - ping:0.2f} secondes")
     return matrix[-1][-1], actions_selection
 
 
-dynamic_wallet(capacite=50000, actions=create_actions_objects_csv())
+@perfs_decorator  # Comment for faster execution
+def run_program():
+    dynamic_wallet(capacite=50000, actions=create_actions_objects_csv())
+
+
+run_program()
